@@ -1,0 +1,28 @@
+---
+title: "p8105_hw2_hy2580"
+author: "haokun yuan"
+date: "10/1/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+##Problem 1
+
+Read and Clean the Data:
+```{r}
+nyc_transit_data = read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
+  janitor::clean_names() %>%
+  select(nyc_transit_data, line, station_name, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, station_latitude, station_longitude, entry, vending, entrance_type, ada)
+```
+The nyc_transit_data dataset contains 13 variables, which are "line","station","rout"
+I first use janitor:clean_names to convert the names of the variable, then selected the variable we want from the original dataset and changed the value of "entry" variable to logical variable. There are `{r}ncol(nyc_transit_data)` columns and `{r}nrow(nyc_transit_data)` rows in the dataset.
+The dataset is tidy since all the column are variables, rows are observations and every value has a cell.
+```{r}
+
+```
+
+
