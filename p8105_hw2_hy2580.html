@@ -148,22 +148,33 @@ $(document).ready(function () {
 ##   `Entrance Longitude` = col_double()
 ## )</code></pre>
 <pre><code>## See spec(...) for full column specifications.</code></pre>
-<pre class="r"><code>#select wanted variables
+<pre class="r"><code># import data and format data with appropriate variable names
 nyc_transit_data = select(nyc_transit_data, line, station_name, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, station_latitude, station_longitude, entry, vending, entrance_type, ada)
-#convert the class of variable &quot;entry&quot; to logical
-nyc_transit_data$entry = recode(nyc_transit_data$entry, `YES` = TRUE, `NO` = FALSE )</code></pre>
+# select wanted variables
+nyc_transit_data$entry = recode(nyc_transit_data$entry, `YES` = TRUE, `NO` = FALSE )
+# convert the class of variable &quot;entry&quot; to logical</code></pre>
 <p>The nyc_transit_data dataset contains 13 variables, which are “line”,“station”,“route”</p>
 <p>I first use janitor:clean_names to convert the names of the variable, then selected the variable we want from the original dataset and changed the value of “entry” variable to logical variable. There are <code>{r}ncol(nyc_transit_data)</code> columns and <code>{r}nrow(nyc_transit_data)</code> rows in the dataset. The dataset is not tidy although all the column are variables, rows are observations and every value has a cell, route number is spread into 11 columns.</p>
 <p>There are <code>{r}count(distinct(nyc_transit_data, station_name, line))</code> distinct stations.</p>
-<p><code>{r}sum(distinct(nyc_transit_data,station_name, ada)$ada, na.rm = TRUE)</code> stations are ADA compliant. #how come a station have both true and false for ada <code>{r}count(nyc_transit_data, vending)</code></p>
+<p><code>{r}sum(distinct(nyc_transit_data,station_name, ada)$ada, na.rm = TRUE)</code> stations are ADA compliant.</p>
+<p><code>{r}count(nyc_transit_data, vending)</code></p>
 <pre class="r"><code>nyc_transit_tidy = gather(nyc_transit_data, key = &quot;route_number&quot;, value = &quot;route_name&quot;, route1:route11)
-# A tibble: 56 x 2</code></pre>
+# tidy nyc_transit_data
+# make route number and route name distinct variables</code></pre>
+<pre class="r"><code>nyc_transit_a = filter(nyc_transit_tidy, route_name == &quot;A&quot;)
+#exclude all the route name except A </code></pre>
+<p>There are <code>{r}count(distinct(nyc_transit_a,station_name))</code>distinct stations serve the A train.</p>
+<p>Of the stations that serves A train,<code>{r}</code> of them are ADA compliant.</p>
 </div>
 <div id="problem-2" class="section level2">
 <h2>Problem 2</h2>
 <pre class="r"><code>library(readxl)
-mr_trash_wheel = read_excel(&quot;data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;) %&gt;%
-  janitor::clean_names()</code></pre>
+mr_trash_wheel = read_excel(&quot;data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;, sheet = 1, range = cell_cols(&quot;A:N&quot;)) %&gt;%
+  janitor::clean_names() %&gt;% 
+# specify sheet number = 1
+# omit column M
+# format the data with appropriate variable names
+  mutate(sports_balls = round(sports_balls, digits = 0))</code></pre>
 </div>
 
 

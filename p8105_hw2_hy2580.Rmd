@@ -16,10 +16,11 @@ Read and Clean the Data:
 ```{r}
 nyc_transit_data = read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
   janitor::clean_names()
-#select wanted variables
+# import data and format data with appropriate variable names
 nyc_transit_data = select(nyc_transit_data, line, station_name, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, station_latitude, station_longitude, entry, vending, entrance_type, ada)
-#convert the class of variable "entry" to logical
+# select wanted variables
 nyc_transit_data$entry = recode(nyc_transit_data$entry, `YES` = TRUE, `NO` = FALSE )
+# convert the class of variable "entry" to logical
 ```
 
 The nyc_transit_data dataset contains 13 variables, which are "line","station","route"
@@ -31,23 +32,35 @@ The dataset is not tidy although all the column are variables, rows are observat
 There are `{r}count(distinct(nyc_transit_data, station_name, line))` distinct stations.
 
 `{r}sum(distinct(nyc_transit_data,station_name, ada)$ada, na.rm = TRUE)` stations are ADA compliant.
-#how come a station have both true and false for ada
+
 `{r}count(nyc_transit_data, vending)`
 
 
 ```{r}
 nyc_transit_tidy = gather(nyc_transit_data, key = "route_number", value = "route_name", route1:route11)
-# A tibble: 56 x 2
+# tidy nyc_transit_data
+# make route number and route name distinct variables
 ```
 
+```{r}
+nyc_transit_a = filter(nyc_transit_tidy, route_name == "A")
+#exclude all the route name except A 
+```
 
+There are `{r}count(distinct(nyc_transit_a,station_name))`distinct stations serve the A train.
+
+Of the stations that serves A train,`{r}` of them are ADA compliant.
 
 ##Problem 2
 
 ```{r}
 library(readxl)
-mr_trash_wheel = read_excel("data/HealthyHarborWaterWheelTotals2017-9-26.xlsx") %>%
-  janitor::clean_names()
+mr_trash_wheel = read_excel("data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = 1, range = cell_cols("A:N")) %>%
+  janitor::clean_names() %>% 
+# specify sheet number = 1
+# omit column M
+# format the data with appropriate variable names
+  mutate(sports_balls = round(sports_balls, digits = 0))
 ```
 
 
