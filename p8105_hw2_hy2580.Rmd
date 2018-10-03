@@ -74,7 +74,7 @@ prcp_2016 = read_excel("data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet
   janitor::clean_names() 
 # import precipitation data on 2016
 
-prcp = left_join(prcp_2017, prcp_2016, by = "year")
+#prcp = left_join(prcp_2017, prcp_2016, by = "year")
 
 ```
 

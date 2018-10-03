@@ -174,7 +174,18 @@ mr_trash_wheel = read_excel(&quot;data/HealthyHarborWaterWheelTotals2017-9-26.xl
 # specify sheet number = 1
 # omit column M
 # format the data with appropriate variable names
-  mutate(sports_balls = round(sports_balls, digits = 0))</code></pre>
+  mutate(sports_balls = as.integer(round(sports_balls, digits = 0)))
+# round the number of sports balls.
+# convert the class of sports balls to integer.</code></pre>
+<pre class="r"><code>prcp_2017 = read_excel(&quot;data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;, sheet = 3) %&gt;% 
+  janitor::clean_names() 
+  
+# import precipitation data on 2017
+prcp_2016 = read_excel(&quot;data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;, sheet = 4) %&gt;% 
+  janitor::clean_names() 
+# import precipitation data on 2016
+
+#prcp = left_join(prcp_2017, prcp_2016, by = &quot;year&quot;)</code></pre>
 </div>
 
 
