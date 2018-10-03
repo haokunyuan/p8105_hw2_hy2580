@@ -56,26 +56,45 @@ Of the stations that serves A train,`{r}` of them are ADA compliant.
 ```{r}
 library(readxl)
 mr_trash_wheel = read_excel("data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = 1, range = cell_cols("A:N")) %>%
+# import data from excel with specify sheet number = 1, omit column with notes
   janitor::clean_names() %>% 
-# specify sheet number = 1
-# omit column M
-# format the data with appropriate variable names
+  #clean name
+  na.omit(cols = "dumpster") %>% 
+  # omit rows do not include dumpster-specific data
   mutate(sports_balls = as.integer(round(sports_balls, digits = 0)))
-# round the number of sports balls.
-# convert the class of sports balls to integer.
+  # round the number of sports balls.
+  # convert the class of sports balls to integer.
+
 ```
 
 ```{r}
-prcp_2017 = read_excel("data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = 3) %>% 
-  janitor::clean_names() 
-  
+prcp_2017 = read_excel("data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = 3, range = "A2:B15") %>% 
+  janitor::clean_names() %>% 
+  #na.omit(total)
+  mutate(year = 2016)
 # import precipitation data on 2017
-prcp_2016 = read_excel("data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = 4) %>% 
-  janitor::clean_names() 
+prcp_2016 = read_excel("data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = 4, range = "A2:B15") %>% 
+  janitor::clean_names() %>%
+  #na.omit(cols = "total" )
+  mutate(year = 2016)
+
 # import precipitation data on 2016
 
-#prcp = left_join(prcp_2017, prcp_2016, by = "year")
+prcp = left_join(prcp_2017, prcp_2016, by = "month")  
+  month.name["month"]
 
+```
+
+##Problem 3
+
+```{r}
+# install.packages("devtools")
+devtools::install_github("p8105/p8105.datasets")
+library(p8105.datasets)
+```
+
+```{r}
+brfss = data("brfss_smart2010")
 ```
 
 

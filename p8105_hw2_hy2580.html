@@ -170,22 +170,38 @@ nyc_transit_data$entry = recode(nyc_transit_data$entry, `YES` = TRUE, `NO` = FAL
 <h2>Problem 2</h2>
 <pre class="r"><code>library(readxl)
 mr_trash_wheel = read_excel(&quot;data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;, sheet = 1, range = cell_cols(&quot;A:N&quot;)) %&gt;%
+# import data from excel with specify sheet number = 1, omit column with notes
   janitor::clean_names() %&gt;% 
-# specify sheet number = 1
-# omit column M
-# format the data with appropriate variable names
+  #clean name
+  na.omit(cols = &quot;dumpster&quot;) %&gt;% 
+  # omit rows do not include dumpster-specific data
   mutate(sports_balls = as.integer(round(sports_balls, digits = 0)))
-# round the number of sports balls.
-# convert the class of sports balls to integer.</code></pre>
-<pre class="r"><code>prcp_2017 = read_excel(&quot;data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;, sheet = 3) %&gt;% 
-  janitor::clean_names() 
-  
+  # round the number of sports balls.
+  # convert the class of sports balls to integer.</code></pre>
+<pre class="r"><code>prcp_2017 = read_excel(&quot;data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;, sheet = 3, range = &quot;A2:B15&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  #na.omit(total)
+  mutate(year = 2016)
 # import precipitation data on 2017
-prcp_2016 = read_excel(&quot;data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;, sheet = 4) %&gt;% 
-  janitor::clean_names() 
+prcp_2016 = read_excel(&quot;data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;, sheet = 4, range = &quot;A2:B15&quot;) %&gt;% 
+  janitor::clean_names() %&gt;%
+  #na.omit(cols = &quot;total&quot; )
+  mutate(year = 2016)
+
 # import precipitation data on 2016
 
-#prcp = left_join(prcp_2017, prcp_2016, by = &quot;year&quot;)</code></pre>
+prcp = left_join(prcp_2017, prcp_2016, by = &quot;month&quot;)  
+  month.name[&quot;month&quot;]</code></pre>
+<pre><code>## [1] NA</code></pre>
+</div>
+<div id="problem-3" class="section level2">
+<h2>Problem 3</h2>
+<pre class="r"><code># install.packages(&quot;devtools&quot;)
+devtools::install_github(&quot;p8105/p8105.datasets&quot;)</code></pre>
+<pre><code>## Skipping install of 'p8105.datasets' from a github remote, the SHA1 (21f5ad1c) has not changed since last install.
+##   Use `force = TRUE` to force installation</code></pre>
+<pre class="r"><code>library(p8105.datasets)</code></pre>
+<pre class="r"><code>brfss = data(&quot;brfss_smart2010&quot;)</code></pre>
 </div>
 
 
