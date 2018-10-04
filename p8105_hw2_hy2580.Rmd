@@ -15,12 +15,15 @@ library(tidyverse)
 Read and Clean the Data:
 ```{r}
 nyc_transit_data = read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
-  janitor::clean_names()
+  janitor::clean_names() %>% 
 # import data and format data with appropriate variable names
-nyc_transit_data = select(nyc_transit_data, line, station_name, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, station_latitude, station_longitude, entry, vending, entrance_type, ada)
+#nyc_transit_data = select(nyc_transit_data, line, station_name, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, station_latitude, station_longitude, entry, vending, entrance_type, ada)
+  select(line, station_name, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, station_latitude, station_longitude, entry, vending, entrance_type, ada) %>% 
+  mutate(recode(entry,`YES` = TRUE, `NO` = FALSE )) #%>% 
+  #View()
 # select wanted variables
-nyc_transit_data$entry = recode(nyc_transit_data$entry, `YES` = TRUE, `NO` = FALSE )
-nyc_transit_data
+#nyc_transit_data$entry = recode(nyc_transit_data$entry, `YES` = TRUE, `NO` = FALSE )
+
 # convert the class of variable "entry" to logical
 ```
 
@@ -95,22 +98,34 @@ library(p8105.datasets)
 ```
 
 ```{r}
-brfss_smart2010 %>% 
+brfss_tidy =
+  brfss_smart2010 %>% 
   janitor::clean_names() %>%
   select(-class,-topic, -question, -sample_size,-(confidence_limit_low:geo_location)) %>%  
-  filter(response == c("Excellent", "Very good", "Good", "Fair", "Poor")) %>% 
+  filter(response %in% c("Excellent", "Very good", "Good", "Fair", "Poor")) %>% 
   spread(key = response, value = data_value) %>% 
   janitor::clean_names() %>% 
-  mutate(excellent_verygood = (excellent + very_good)/(excellent+ very_good + good + fair + poor)) #%>%  
+  mutate(excellent_verygood = (excellent + very_good)/(excellent + very_good + good + fair + poor))   
   #variable unit
-  #View()
+  
 
 ```
 
 ```{r}
-
+#brfss_smart2010 %>% 
+  #filter(Year == 2012, Response == Excellent)
+brfss_2002 = brfss_tidy %>%
+  filter(year == 2002)
+ggplot(brfss_2002, aes(x = excellent)) +
+  geom_histogram()
 ```
 
+```{r}
+brfss_ny_queens = brfss_tidy %>% 
+    filter(locationdesc %in% c("NY - New York County", "NY - Queens County", year %in% 2002:2010 ))
+ggplot(brfss_ny_queens, aes(x = year, y = excellent, color = locationdesc)) +
+  geom_point()
+```
 
 
 
