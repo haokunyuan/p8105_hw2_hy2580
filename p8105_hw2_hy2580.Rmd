@@ -20,6 +20,7 @@ nyc_transit_data = read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.cs
 nyc_transit_data = select(nyc_transit_data, line, station_name, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, station_latitude, station_longitude, entry, vending, entrance_type, ada)
 # select wanted variables
 nyc_transit_data$entry = recode(nyc_transit_data$entry, `YES` = TRUE, `NO` = FALSE )
+nyc_transit_data
 # convert the class of variable "entry" to logical
 ```
 
@@ -94,7 +95,20 @@ library(p8105.datasets)
 ```
 
 ```{r}
-brfss = data("brfss_smart2010")
+brfss_smart2010 %>% 
+  janitor::clean_names() %>%
+  select(-class,-topic, -question, -sample_size,-(confidence_limit_low:geo_location)) %>%  
+  filter(response == c("Excellent", "Very good", "Good", "Fair", "Poor")) %>% 
+  spread(key = response, value = data_value) %>% 
+  janitor::clean_names() %>% 
+  mutate(excellent_verygood = (excellent + very_good)/(excellent+ very_good + good + fair + poor)) #%>%  
+  #variable unit
+  #View()
+
+```
+
+```{r}
+
 ```
 
 

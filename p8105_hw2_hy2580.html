@@ -152,7 +152,25 @@ $(document).ready(function () {
 nyc_transit_data = select(nyc_transit_data, line, station_name, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, station_latitude, station_longitude, entry, vending, entrance_type, ada)
 # select wanted variables
 nyc_transit_data$entry = recode(nyc_transit_data$entry, `YES` = TRUE, `NO` = FALSE )
-# convert the class of variable &quot;entry&quot; to logical</code></pre>
+nyc_transit_data</code></pre>
+<pre><code>## # A tibble: 1,868 x 19
+##    line  station_name route1 route2 route3 route4 route5 route6 route7
+##    &lt;chr&gt; &lt;chr&gt;        &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; 
+##  1 4 Av… 25th St      R      &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;  
+##  2 4 Av… 25th St      R      &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;  
+##  3 4 Av… 36th St      N      R      &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;  
+##  4 4 Av… 36th St      N      R      &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;  
+##  5 4 Av… 36th St      N      R      &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;  
+##  6 4 Av… 45th St      R      &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;  
+##  7 4 Av… 45th St      R      &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;  
+##  8 4 Av… 45th St      R      &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;  
+##  9 4 Av… 45th St      R      &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;  
+## 10 4 Av… 53rd St      R      &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;  
+## # ... with 1,858 more rows, and 10 more variables: route8 &lt;int&gt;,
+## #   route9 &lt;int&gt;, route10 &lt;int&gt;, route11 &lt;int&gt;, station_latitude &lt;dbl&gt;,
+## #   station_longitude &lt;dbl&gt;, entry &lt;lgl&gt;, vending &lt;chr&gt;,
+## #   entrance_type &lt;chr&gt;, ada &lt;lgl&gt;</code></pre>
+<pre class="r"><code># convert the class of variable &quot;entry&quot; to logical</code></pre>
 <p>The nyc_transit_data dataset contains 13 variables, which are “line”,“station”,“route”</p>
 <p>I first use janitor:clean_names to convert the names of the variable, then selected the variable we want from the original dataset and changed the value of “entry” variable to logical variable. There are <code>{r}ncol(nyc_transit_data)</code> columns and <code>{r}nrow(nyc_transit_data)</code> rows in the dataset. The dataset is not tidy although all the column are variables, rows are observations and every value has a cell, route number is spread into 11 columns.</p>
 <p>There are <code>{r}count(distinct(nyc_transit_data, station_name, line))</code> distinct stations.</p>
@@ -201,7 +219,31 @@ devtools::install_github(&quot;p8105/p8105.datasets&quot;)</code></pre>
 <pre><code>## Skipping install of 'p8105.datasets' from a github remote, the SHA1 (21f5ad1c) has not changed since last install.
 ##   Use `force = TRUE` to force installation</code></pre>
 <pre class="r"><code>library(p8105.datasets)</code></pre>
-<pre class="r"><code>brfss = data(&quot;brfss_smart2010&quot;)</code></pre>
+<pre class="r"><code>brfss_smart2010 %&gt;% 
+  janitor::clean_names() %&gt;%
+  select(-class,-topic, -question, -sample_size,-(confidence_limit_low:geo_location)) %&gt;%  
+  filter(response == c(&quot;Excellent&quot;, &quot;Very good&quot;, &quot;Good&quot;, &quot;Fair&quot;, &quot;Poor&quot;)) %&gt;% 
+  spread(key = response, value = data_value) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  mutate(excellent_verygood = (excellent + very_good)/(excellent+ very_good + good + fair + poor)) #%&gt;%  </code></pre>
+<pre><code>## Warning in response == c(&quot;Excellent&quot;, &quot;Very good&quot;, &quot;Good&quot;, &quot;Fair&quot;, &quot;Poor&quot;):
+## longer object length is not a multiple of shorter object length</code></pre>
+<pre><code>## # A tibble: 491 x 9
+##     year locationabbr locationdesc excellent  fair  good  poor very_good
+##    &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;            &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
+##  1  2002 AR           AR - Pulask…      24.1  NA    NA    NA        29.3
+##  2  2002 DE           DE - New Ca…      22.5  11.2  28.2   3.2      34.9
+##  3  2002 FL           FL - Hillsb…      26.8   8.6  25.7   4.2      34.6
+##  4  2002 GA           GA - DeKalb…      19.2   5.2  31.5   2.8      41.3
+##  5  2002 GA           GA - Fulton…      29.7   6.8  24.3   3.3      35.9
+##  6  2002 HI           HI - Maui C…      NA    NA    30.9  NA        NA  
+##  7  2002 IL           IL - Cook C…      18.7  11.7  29.9   4.1      35.5
+##  8  2002 KS           KS - Shawne…      21.6   9    28.6  NA        37.1
+##  9  2002 MA           MA - Bristo…      20    10.1  29.7   4.1      36.2
+## 10  2002 MA           MA - Essex …      26.7  11.3  26.2   4.7      31.1
+## # ... with 481 more rows, and 1 more variable: excellent_verygood &lt;dbl&gt;</code></pre>
+<pre class="r"><code>  #variable unit
+  #View()</code></pre>
 </div>
 
 
