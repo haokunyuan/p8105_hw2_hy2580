@@ -2,10 +2,10 @@
 title: "p8105_hw2_hy2580"
 author: "haokun yuan"
 date: "10/1/2018"
-output: html_document
+output: github_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
@@ -17,27 +17,27 @@ Read and Clean the Data:
 nyc_transit_data = read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
   janitor::clean_names() %>% 
 # import data and format data with appropriate variable names
-#nyc_transit_data = select(nyc_transit_data, line, station_name, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, station_latitude, station_longitude, entry, vending, entrance_type, ada)
   select(line, station_name, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, station_latitude, station_longitude, entry, vending, entrance_type, ada) %>% 
-  mutate(recode(entry,`YES` = TRUE, `NO` = FALSE )) #%>% 
-  #View()
+  mutate(entry = recode(entry,`YES` = TRUE, `NO` = FALSE )) 
 # select wanted variables
-#nyc_transit_data$entry = recode(nyc_transit_data$entry, `YES` = TRUE, `NO` = FALSE )
-
+nyc_transit_data
 # convert the class of variable "entry" to logical
 ```
 
 The nyc_transit_data dataset contains 13 variables, which are "line","station","route"
 
 
-I first use janitor:clean_names to convert the names of the variable, then selected the variable we want from the original dataset and changed the value of "entry" variable to logical variable. There are `{r}ncol(nyc_transit_data)` columns and `{r}nrow(nyc_transit_data)` rows in the dataset.
-The dataset is not tidy although all the column are variables, rows are observations and every value has a cell, route number is spread into 11 columns.
+I first use janitor:clean_names to convert the names of the variable, then selected the variable we want from the original dataset and changed the value of "entry" variable to logical variable. 
 
-There are `{r}count(distinct(nyc_transit_data, station_name, line))` distinct stations.
+There are `r ncol(nyc_transit_data)` columns and `r nrow(nyc_transit_data)` rows in the dataset.
 
-`{r}sum(distinct(nyc_transit_data,station_name, ada)$ada, na.rm = TRUE)` stations are ADA compliant.
+The dataset is not tidy although all the column are variables, rows are observations and every value has a cell, route number is spread across 11 columns.
 
-`{r}count(nyc_transit_data, vending)`
+There are `r count(distinct(nyc_transit_data, station_name, line))` distinct stations.
+
+`r sum(distinct(nyc_transit_data, station_name, line, ada)$ada, na.rm = TRUE)` stations are ADA compliant.
+
+`r filter(nyc_transit_data, vending == "NO", entry =="TRUE") %>% nrow / filter(nyc_transit_data, vending == "NO") %>% nrow` of station entrances/exits without vending allow entrance.
 
 
 ```{r}
@@ -51,19 +51,19 @@ nyc_transit_a = filter(nyc_transit_tidy, route_name == "A")
 #exclude all the route name except A 
 ```
 
-There are `{r}count(distinct(nyc_transit_a,station_name))`distinct stations serve the A train.
-
-Of the stations that serves A train,`{r}` of them are ADA compliant.
+There are `r count(distinct(nyc_transit_a,station_name,line))`distinct stations serve the A train.
+ 
+Of the stations that serves A train, `r sum(distinct(nyc_transit_a,station_name,line,ada)$ada, na.rm = TRUE)` of them are ADA compliant.
 
 ##Problem 2
 
 ```{r}
 library(readxl)
-mr_trash_wheel = read_excel("data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = 1, range = cell_cols("A:N")) %>%
+mr_trash_wheel = read_excel("data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 1, range = cell_cols("A:N")) %>%
 # import data from excel with specify sheet number = 1, omit column with notes
   janitor::clean_names() %>% 
   #clean name
-  na.omit(cols = "dumpster") %>% 
+  #na.omit(cols = "dumpster") %>% 
   # omit rows do not include dumpster-specific data
   mutate(sports_balls = as.integer(round(sports_balls, digits = 0)))
   # round the number of sports balls.
@@ -72,23 +72,24 @@ mr_trash_wheel = read_excel("data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", 
 ```
 
 ```{r}
-prcp_2017 = read_excel("data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = 3, range = "A2:B15") %>% 
+prcp_2017 = read_excel("data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = 4, range = "A2:B15") %>% 
   janitor::clean_names() %>% 
   #na.omit(total)
-  mutate(year = 2016)
+  mutate(year = 2017)
 # import precipitation data on 2017
-prcp_2016 = read_excel("data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = 4, range = "A2:B15") %>% 
+prcp_2016 = read_excel("data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = 5, range = "A2:B15") %>% 
   janitor::clean_names() %>%
   #na.omit(cols = "total" )
   mutate(year = 2016)
 
 # import precipitation data on 2016
-
-prcp = left_join(prcp_2017, prcp_2016, by = "month")  
-  month.name["month"]
+prcp = left_join(prcp_2017, prcp_2016, by = "month")
+  mutate(prcp, month = month.name[prcp$month])
+  
 
 ```
 
+The median number of sports balls in a dumpster in 2016 is `r median(filter(mr_trash_wheel, year == 2016)$sports_balls)`.
 ##Problem 3
 
 ```{r}
@@ -110,6 +111,9 @@ brfss_tidy =
   
 
 ```
+There are `r count(distinct(brfss_tidy,locationdesc))` unique locations, and those locations are from `r count(distinct(brfss_tidy,locationabbr))` different state. Since the United States has 50 states and Washington DC, all the states were represented.
+
+In 2002, the median of "Excellent" response value is `r filter(brfss_tidy, year == 2002)$excellent %>% median(na.rm = TRUE)`.
 
 ```{r}
 #brfss_smart2010 %>% 
@@ -122,7 +126,7 @@ ggplot(brfss_2002, aes(x = excellent)) +
 
 ```{r}
 brfss_ny_queens = brfss_tidy %>% 
-    filter(locationdesc %in% c("NY - New York County", "NY - Queens County", year %in% 2002:2010 ))
+    filter(locationdesc %in% c("NY - New York County", "NY - Queens County", year == 2002:2010 ))
 ggplot(brfss_ny_queens, aes(x = year, y = excellent, color = locationdesc)) +
   geom_point()
 ```
